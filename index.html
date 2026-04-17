@@ -3,43 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <title>NSU E/MBA CGPA ESTIMATOR</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
+*{box-sizing:border-box;}
 body{
-margin:0;
-font-family:'Josefin Sans';
-background:linear-gradient(135deg,#0b1f3a,#123a7a);
-color:white;
-display:flex;
-justify-content:center;
-padding:30px;
+  margin:0;
+  font-family:'Josefin Sans';
+  background:linear-gradient(135deg,#0b1f3a,#123a7a);
+  color:white;
+  display:flex;
+  justify-content:center;
+  padding:0;
+  min-height:100vh;
 }
 
-.container{
-width:760px;
-background:rgba(255,255,255,0.08);
-border-radius:20px;
-padding:20px;
+.outer{
+  width:780px;
+  display:flex;
+  flex-direction:column;
 }
 
-/* FLEX HEADER — logos always visible, never overlap */
-.header{display:flex;align-items:center;justify-content:center;gap:14px;padding:6px 0;}
-.header img{width:58px;height:auto;flex-shrink:0;}
+/* STICKY TOP */
+.sticky-top{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:linear-gradient(135deg,#0b1f3a,#123a7a);
+  padding:12px 20px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+}
+
+.header{display:flex;align-items:center;justify-content:center;gap:14px;padding:4px 0 6px;}
+.header img{width:54px;height:auto;flex-shrink:0;}
 .header-text{text-align:center;flex:1;}
-
 h1{color:#7ecbff;margin:0;font-size:20px;}
 .sub{font-size:13px;opacity:0.85;margin-top:2px;}
 
-.nav{text-align:center;margin:10px 0;}
+.nav{text-align:center;padding-bottom:2px;}
 .nav a{
-margin:3px;padding:6px 12px;
-background:#66b2ff;border-radius:20px;
-color:white;text-decoration:none;font-size:12px;
-display:inline-block;transition:background 0.2s,color 0.2s;
+  margin:3px;padding:6px 12px;
+  background:#66b2ff;border-radius:20px;
+  color:white;text-decoration:none;font-size:12px;
+  display:inline-block;transition:background 0.2s,color 0.2s;
 }
 .nav a:hover{background:#00e676;color:#000;}
+
+/* SCROLLABLE CONTENT */
+.content{
+  padding:14px 20px 30px;
+  flex:1;
+}
 
 .select-row{display:flex;gap:6px;margin-bottom:10px;}
 select{flex:1;padding:6px;border-radius:6px;border:none;}
@@ -48,16 +61,22 @@ select{flex:1;padding:6px;border-radius:6px;border:none;}
 .grid{display:flex;gap:10px;}
 .panel{flex:1;background:rgba(255,255,255,0.08);padding:10px;border-radius:10px;}
 
-#rows{max-height:220px;overflow-y:auto;}
+#rows{max-height:240px;overflow-y:auto;}
 
 .row{display:flex;gap:5px;margin:4px 0;}
 .row select{flex:1;}
 
-button{padding:8px 16px;font-size:13px;font-family:'Josefin Sans';font-weight:600;border:none;border-radius:8px;background:#66b2ff;color:white;cursor:pointer;transition:background 0.2s;}
+.btn-row{display:flex;gap:8px;margin-top:6px;}
+button{
+  padding:8px 16px;font-size:13px;
+  font-family:'Josefin Sans';font-weight:600;
+  border:none;border-radius:8px;
+  background:#66b2ff;color:white;
+  cursor:pointer;transition:background 0.2s;
+}
 button:hover{background:#3a9aee;}
 .clear{background:#e53935;}
 .clear:hover{background:#b71c1c;}
-
 .row button{padding:4px 8px;font-size:12px;font-weight:400;}
 
 .result{display:flex;justify-content:space-between;margin-top:5px;}
@@ -69,406 +88,446 @@ button:hover{background:#3a9aee;}
 .notdone{color:#ff5252;}
 
 .box{
-margin-top:8px;
-background:rgba(255,255,255,0.1);
-padding:8px;
-border-radius:8px;
-font-size:12px;
-white-space:pre-line;
+  margin-top:8px;
+  background:rgba(255,255,255,0.1);
+  padding:8px;border-radius:8px;
+  font-size:12px;white-space:pre-line;
 }
 
-canvas{
-background:white;
-border-radius:8px;
-margin-top:8px;
+.warn-msg{
+  margin-top:6px;
+  background:rgba(255,180,0,0.18);
+  border-left:3px solid #ffcc00;
+  color:#ffdf80;
+  padding:7px 10px;
+  border-radius:6px;
+  font-size:12px;
+  display:none;
+}
+
+canvas{background:white;border-radius:8px;margin-top:8px;}
+
+.disclaimer{
+  margin-top:8px;font-size:10.5px;color:#aac8f0;
+  font-style:italic;line-height:1.5;
+  background:rgba(255,255,255,0.06);
+  padding:7px 10px;border-radius:8px;
+  border-left:3px solid #66b2ff;
 }
 </style>
 </head>
 
 <body>
+<div class="outer">
 
-<div class="container">
+  <!-- STICKY HEADER + NAV -->
+  <div class="sticky-top">
+    <div class="header">
+      <a href="index.html"><img src="nsulogo.jpg" alt="NSU Logo" style="cursor:pointer;"></a>
+      <div class="header-text">
+        <h1>NSU E/MBA CGPA ESTIMATOR</h1>
+        <div class="sub">Developed by MBA and EMBA Program</div>
+      </div>
+      <img src="sbe-logo.png" alt="SBE Logo">
+    </div>
+    <div class="nav">
+      <a href="index.html">Home</a>
+      <a href="flowchart.html">Course Flowchart</a>
+      <a href="gpolicy.html">Grading Policy</a>
+      <a href="help.html">User Guideline</a>
+      <a href="https://www.northsouth.edu/academics/schools/sbe/mba-emba-programs.html" target="_blank">Official E/MBA Website</a>
+    </div>
+  </div>
 
-<div class="header">
-<a href="index.html"><img src="nsulogo.jpg" alt="NSU Logo" style="cursor:pointer;"></a>
-<div class="header-text">
-  <h1>NSU E/MBA CGPA ESTIMATOR</h1>
-  <div class="sub">Developed by MBA and EMBA Program</div>
-</div>
-<img src="sbe-logo.png" alt="SBE Logo">
-</div>
+  <!-- SCROLLABLE CONTENT -->
+  <div class="content">
+    <div class="grid">
 
-<div class="nav">
-<a href="index.html">Home</a>
-<a href="flowchart.html">Course Flowchart</a>
-<a href="gpolicy.html">Grading Policy</a>
-<a href="help.html">User Guideline</a>
-<a href="https://www.northsouth.edu/academics/schools/sbe/mba-emba-programs.html" target="_blank">Official E/MBA Website</a>
-</div>
+      <!-- LEFT PANEL -->
+      <div class="panel">
+        <div class="select-row">
+          <select id="program" onchange="handleProgram()">
+            <option value="">Select Program</option>
+            <option>MBA</option>
+            <option>EMBA</option>
+          </select>
+          <select id="batch" onchange="handleBatch()">
+            <option value="">Select Batch</option>
+            <option value="new">After 2019</option>
+            <option value="old">2019 or Previous</option>
+          </select>
+        </div>
 
-<div class="grid">
+        <div id="rows"></div>
 
-<!-- LEFT -->
-<div class="panel">
+        <div id="openElectiveWarn" class="warn-msg">
+          ⚠️ You must take BUS 698.
+        </div>
 
-<div class="select-row">
-<select id="program" onchange="handleProgram()">
-<option value="">Select Program</option>
-<option>MBA</option>
-<option>EMBA</option>
-</select>
+        <div class="btn-row">
+          <button onclick="addRow()">Add</button>
+          <button class="clear" onclick="clearAll()">Clear</button>
+        </div>
 
-<select id="batch" onchange="handleBatch()">
-<option value="">Select Batch</option>
-<option value="new">After 2019</option>
-<option value="old">2019 or Previous</option>
-</select>
-</div>
+        <div class="result">
+          <div>CGPA: <span id="cgpa">0.00</span></div>
+          <div>Credit Counted: <span id="counted">0</span></div>
+        </div>
+        <div class="result">
+          <div>Credit Passed: <span id="passed">0</span></div>
+          <div>Credit Remaining: <span id="remaining">—</span></div>
+        </div>
 
-<div id="rows"></div>
+        <div class="disclaimer">
+          ⚠️ <strong>Disclaimer:</strong> The estimator is intended solely for calculating MBA and EMBA CGPA. For any additional clarification, kindly visit or reach out to the MBA &amp; EMBA Program Office.
+        </div>
+      </div>
 
-<button onclick="addRow()">Add</button>
-<button class="clear" onclick="clearAll()">Clear</button>
+      <!-- RIGHT PANEL -->
+      <div class="panel">
+        <div id="advisor" class="box"></div>
+        <div id="simulator" class="box"></div>
+        <div id="retake" class="box"></div>
 
-<div class="result">
-<div>CGPA: <span id="cgpa">0.00</span></div>
-<div>Credits: <span id="credits">0</span></div>
-</div>
+        <div class="box">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <b>🧠 AI Level Progress</b>
+            <span id="progressPercent" style="font-size:12px;font-weight:600;color:#00e676;">0%</span>
+          </div>
+          <div class="progress-bar"><div id="courseBar" class="progress-fill"></div></div>
+          <div id="courseLevels"></div>
+          <div id="degreeMsg"></div>
+        </div>
 
-<div class="result">
-<div>Credit Counted: <span id="counted">0</span></div>
-<div>Credit Passed: <span id="passed">0</span></div>
-</div>
+        <canvas id="cgpaChart" width="320" height="150"></canvas>
+        <div id="status"></div>
+      </div>
 
-<div style="margin-top:8px;font-size:10.5px;color:#aac8f0;font-style:italic;line-height:1.5;background:rgba(255,255,255,0.06);padding:7px 10px;border-radius:8px;border-left:3px solid #66b2ff;">
-⚠️ <strong>Disclaimer:</strong> The estimator is intended solely for calculating MBA and EMBA CGPA. For any additional clarification, kindly visit or reach out to the MBA &amp; EMBA Program Office.
-</div>
-
-</div>
-
-<!-- RIGHT -->
-<div class="panel">
-
-<div id="advisor" class="box"></div>
-<div id="simulator" class="box"></div>
-<div id="retake" class="box"></div>
-
-<div class="box">
-<div style="display:flex;justify-content:space-between;align-items:center;">
-<b>🧠 AI Level Progress</b>
-<span id="progressPercent" style="font-size:12px;font-weight:600;color:#00e676;">0%</span>
-</div>
-<div class="progress-bar"><div id="courseBar" class="progress-fill"></div></div>
-<div id="courseLevels"></div>
-<div id="degreeMsg"></div>
-</div>
-
-<canvas id="cgpaChart" width="320" height="150"></canvas>
-
-<div id="status"></div>
-
-</div>
-
-</div>
-
+    </div>
+  </div>
 </div>
 
 <script>
-
 let gradeMap={
-"A":4,"A-":3.7,"B+":3.3,"B":3,"B-":2.7,
-"C+":2.3,"C":2,"C-":1.7,"D+":1.3,"D":1,"F":0,"Waived":0
+  "A":4,"A-":3.7,"B+":3.3,"B":3,"B-":2.7,
+  "C+":2.3,"C":2,"C-":1.7,"D+":1.3,"D":1,"F":0,"Waived":0
 };
 
 let cgpaHistory=[];
 
 function handleProgram(){
-let p=document.getElementById("program").value;
-document.getElementById("batch").style.display=(p==="MBA")?"block":"none";
-clearAll();
+  let p=document.getElementById("program").value;
+  document.getElementById("batch").style.display=(p==="MBA")?"block":"none";
+  clearAll();
 }
 
 function handleBatch(){ clearAll(); }
 
+function getTotalCredits(){
+  let p=document.getElementById("program").value;
+  if(p==="MBA") return 60;
+  if(p==="EMBA") return 50;
+  return null;
+}
+
 function getCourses(){
-let p=document.getElementById("program").value;
-let b=document.getElementById("batch").value;
+  let p=document.getElementById("program").value;
+  let b=document.getElementById("batch").value;
 
-let majors=["MAJOR1","MAJOR2","MAJOR3","MAJOR4"];
+  // 8 major slots
+  let majors=["MAJOR1","MAJOR2","MAJOR3","MAJOR4","MAJOR5","MAJOR6","MAJOR7","MAJOR8"];
 
-if(p==="MBA"){
-if(!b) return [];
-if(b==="new") return ["BUS 500","BUS 501","BUS 505","BUS 511","BUS 516","BUS 518","BUS 520","BUS 525","BUS 530","BUS 535","BUS 601","BUS 620","BUS 635","BUS 650","BUS 685","BUS 690","BUS 698","BUS 699","Open Elective",...majors];
-if(b==="old") return ["BUS 500","BUS 501","BUS 505","BUS 511","BUS 516","BUS 518","BUS 520","BUS 525","BUS 530","BUS 601","BUS 620","BUS 635","BUS 650","BUS 685","BUS 690","BUS 698","Open Elective 1","Open Elective 2",...majors];
-}
+  if(p==="MBA"){
+    if(!b) return [];
+    if(b==="new") return [
+      "BUS 500","BUS 501","BUS 505","BUS 511","BUS 516","BUS 518",
+      "BUS 520","BUS 525","BUS 530","BUS 535",
+      "BUS 601","BUS 620","BUS 635","BUS 650","BUS 685",
+      "BUS 690","BUS 698","BUS 699","Open Elective",
+      ...majors
+    ];
+    if(b==="old") return [
+      "BUS 500","BUS 501","BUS 505","BUS 511","BUS 516","BUS 518",
+      "BUS 520","BUS 525","BUS 530",
+      "BUS 601","BUS 620","BUS 635","BUS 650","BUS 685",
+      "BUS 690","BUS 698","Open Elective 1","Open Elective 2",
+      ...majors
+    ];
+  }
 
-if(p==="EMBA"){
-return ["EMB 500","EMB 501","EMB 502","EMB 510","EMB 520","EMB 601","EMB 602","EMB 620","EMB 650","EMB 660","EMB 670","EMB 690","BUS 700",...majors];
-}
+  if(p==="EMBA"){
+    return [
+      "EMB 500","EMB 501","EMB 502","EMB 510","EMB 520",
+      "EMB 601","EMB 602","EMB 620","EMB 650","EMB 660","EMB 670","EMB 690",
+      "BUS 700",
+      ...majors
+    ];
+  }
 
-return [];
+  return [];
 }
 
 function addRow(){
+  let p=document.getElementById("program").value;
+  let b=document.getElementById("batch").value;
+  if(!p) return alert("Select Program first");
+  if(p==="MBA" && !b) return alert("Select Batch first");
 
-let p=document.getElementById("program").value;
-let b=document.getElementById("batch").value;
+  let div=document.createElement("div");
+  div.className="row";
+  div.innerHTML=`
+    <select class="course">
+      <option value="">Select Course</option>
+      ${getCourses().map(c=>`<option>${c}</option>`).join("")}
+    </select>
+    <select class="grade">
+      <option value="">Select Grade</option>
+      <option>A</option><option>A-</option><option>B+</option><option>B</option><option>B-</option>
+      <option>C+</option><option>C</option><option>C-</option><option>D+</option><option>D</option>
+      <option>F</option><option>Waived</option>
+    </select>
+    <button onclick="this.parentElement.remove();calculate()">X</button>
+  `;
+  document.getElementById("rows").appendChild(div);
+  div.querySelectorAll("select").forEach(s=>s.onchange=calculate);
+}
 
-if(!p) return alert("Select Program first");
-if(p==="MBA" && !b) return alert("Select Batch first");
+function getCredit(course, grade, program, batch){
+  // Waived always = 0 credit
+  if(grade==="Waived") return 0;
 
-let div=document.createElement("div");
-div.className="row";
+  // BUS 500 = 0 credit always (MBA)
+  if(course==="BUS 500") return 0;
 
-div.innerHTML=`
-<select class="course">
-<option value="">Select Course</option>
-${getCourses().map(c=>`<option>${c}</option>`)}
-</select>
+  // BUS 698 rules
+  if(course==="BUS 698"){
+    if(program==="MBA" && batch==="new") return 0;   // After 2019: no credit
+    if(program==="MBA" && batch==="old") return 1;   // 2019 or prev: 1 credit
+  }
 
-<select class="grade">
-<option value="">Select Grade</option>
-<option>A</option><option>A-</option><option>B+</option><option>B</option><option>B-</option>
-<option>C+</option><option>C</option><option>C-</option><option>D+</option><option>D</option>
-<option>F</option><option>Waived</option>
-</select>
+  // EMBA BUS 700 = 2 credits
+  if(program==="EMBA" && course==="BUS 700") return 2;
 
-<button onclick="this.parentElement.remove();calculate()">X</button>
-`;
+  return 3;
+}
 
-document.getElementById("rows").appendChild(div);
-div.querySelectorAll("select").forEach(s=>s.onchange=calculate);
+function checkOpenElectiveWarning(){
+  let p=document.getElementById("program").value;
+  let b=document.getElementById("batch").value;
+  let warnEl=document.getElementById("openElectiveWarn");
+
+  if(p==="MBA" && b==="new"){
+    let rows=document.querySelectorAll(".row");
+    let hasOpenElective=false;
+    rows.forEach(r=>{
+      let c=r.querySelector(".course").value;
+      if(c==="Open Elective") hasOpenElective=true;
+    });
+    warnEl.style.display=hasOpenElective?"block":"none";
+  } else {
+    warnEl.style.display="none";
+  }
 }
 
 function calculate(){
+  checkOpenElectiveWarning();
 
-let p=document.getElementById("program").value;
-let b=document.getElementById("batch").value;
-if(p==="MBA" && !b) return;
+  let p=document.getElementById("program").value;
+  let b=document.getElementById("batch").value;
+  if(p==="MBA" && !b) return;
 
-let rows=document.querySelectorAll(".row");
-let courseAttempts={};
+  let rows=document.querySelectorAll(".row");
+  let courseAttempts={};
 
-rows.forEach(r=>{
-let c=r.querySelector(".course").value;
-let g=r.querySelector(".grade").value;
-if(!c||!g)return;
+  rows.forEach(r=>{
+    let c=r.querySelector(".course").value;
+    let g=r.querySelector(".grade").value;
+    if(!c||!g) return;
+    let credit=getCredit(c,g,p,b);
+    if(!courseAttempts[c]) courseAttempts[c]=[];
+    courseAttempts[c].push({grade:g,credit:credit});
+  });
 
-let credit=3;
+  let totalPoints=0, totalCredited=0, creditPassed=0;
+  let passed={}, waived={}, failedCourses=[];
 
-if(c==="BUS 500") credit=0;
-if(p==="EMBA" && c==="BUS 700") credit=2;
-if(p==="MBA"){
-if(b==="old" && c==="BUS 698") credit=1;
-if(b==="new" && c==="BUS 698") credit=0;
-}
+  Object.keys(courseAttempts).forEach(course=>{
+    let attempts=courseAttempts[course];
 
-if(g==="Waived") credit=0;
+    let hasWaived=attempts.some(a=>a.grade==="Waived");
+    if(hasWaived) waived[course]=true;
 
-if(!courseAttempts[c]) courseAttempts[c]=[];
-courseAttempts[c].push({grade:g,credit:credit});
-});
+    // Best non-waived attempt
+    let best=attempts.reduce((bst,a)=>{
+      if(a.grade==="Waived") return bst;
+      if(!bst) return a;
+      return gradeMap[a.grade]>gradeMap[bst.grade]?a:bst;
+    },null);
 
-let totalPoints=0,totalCredits=0,creditPassed=0;
-let passed={},waived={},failedCourses=[];
+    if(best){
+      // Credit Counted: best attempt credit for ANY grade (incl. F), not Waived
+      totalCredited+=best.credit;
+      totalPoints+=best.credit*gradeMap[best.grade];
 
-Object.keys(courseAttempts).forEach(course=>{
-let attempts=courseAttempts[course];
+      if(best.grade==="F"){
+        failedCourses.push({course,credit:best.credit});
+      } else {
+        passed[course]=true;
+        creditPassed+=best.credit;
+      }
+    }
+  });
 
-/* FIX: track waived courses */
-let hasWaived=attempts.some(a=>a.grade==="Waived");
-if(hasWaived) waived[course]=true;
+  // CGPA = Total Grade Points / Total Credit Counted
+  let cgpa=totalCredited?(totalPoints/totalCredited).toFixed(2):"0.00";
 
-let best=attempts.reduce((b,a)=>{
-if(a.grade==="Waived") return b;
-if(!b) return a;
-return gradeMap[a.grade]>gradeMap[b.grade]?a:b;
-},null);
+  // Credit Remaining = program total - credit passed
+  let totalProg=getTotalCredits();
+  let remainingText=(totalProg!==null)?(totalProg-creditPassed):"—";
 
-/* Only count the best attempt's credit — not all retakes */
-if(best){
-totalCredits+=best.credit;
-if(best.grade==="F") failedCourses.push({course,credit:best.credit});
-else{
-passed[course]=true;
-creditPassed+=best.credit;
-}
-totalPoints+=best.credit*gradeMap[best.grade];
-}
-});
+  document.getElementById("cgpa").innerText=cgpa;
+  document.getElementById("counted").innerText=totalCredited;
+  document.getElementById("passed").innerText=creditPassed;
+  document.getElementById("remaining").innerText=remainingText;
 
-let cgpa=totalCredits?(totalPoints/totalCredits).toFixed(2):"0.00";
+  // AI ADVISOR
+  let aiAdvice="";
+  if(cgpa>=3.7) aiAdvice="🔥 Excellent performance.";
+  else if(cgpa>=3.3) aiAdvice="💡 Doing well.";
+  else if(cgpa>=3.0) aiAdvice="⚠️ Improve performance.";
+  else if(cgpa>=2.75) aiAdvice="📘 Maintain carefully.";
+  else aiAdvice="🚨 Critical zone.";
+  document.getElementById("advisor").innerText=aiAdvice;
 
-document.getElementById("cgpa").innerText=cgpa;
-document.getElementById("credits").innerText=totalCredits;
-document.getElementById("counted").innerText=totalCredits;
-document.getElementById("passed").innerText=creditPassed;
+  // SIMULATOR
+  let simA=((totalPoints+12)/(totalCredited+3)).toFixed(2);
+  let simB=((totalPoints+9)/(totalCredited+3)).toFixed(2);
+  document.getElementById("simulator").innerText=
+    `📊 Next Course Prediction:\nIf A → CGPA: ${simA}\nIf B → CGPA: ${simB}`;
 
-/* AI ADVISOR */
-let aiAdvice="";
-if(cgpa>=3.7) aiAdvice="🔥 Excellent performance.";
-else if(cgpa>=3.3) aiAdvice="💡 Doing well.";
-else if(cgpa>=3.0) aiAdvice="⚠️ Improve performance.";
-else if(cgpa>=2.75) aiAdvice="📘 Maintain carefully.";
-else aiAdvice="🚨 Critical zone.";
-document.getElementById("advisor").innerText=aiAdvice;
+  // RETAKE IMPACT
+  let txt="🔁 Retake Impact:\n";
+  failedCourses.forEach(f=>{
+    let newCg=totalCredited?((totalPoints+f.credit*4)/totalCredited).toFixed(2):"0.00";
+    txt+=`${f.course} → ${newCg}\n`;
+  });
+  document.getElementById("retake").innerText=txt;
 
-/* SIMULATOR */
-let simA=((totalPoints+12)/(totalCredits+3)).toFixed(2);
-let simB=((totalPoints+9)/(totalCredits+3)).toFixed(2);
-document.getElementById("simulator").innerText=
-`📊 Next Course Prediction:\nIf A → CGPA: ${simA}\nIf B → CGPA: ${simB}`;
+  // AI LEVEL PROGRESS
+  let percent=0, html="", ready=false;
 
-/* RETAKE */
-let txt="🔁 Retake Impact:\n";
-failedCourses.forEach(f=>{
-let newCg=((totalPoints+f.credit*4)/totalCredits).toFixed(2);
-txt+=`${f.course} → ${newCg}\n`;
-});
-document.getElementById("retake").innerText=txt;
+  if(p==="MBA"){
+    let f=["BUS 500","BUS 501","BUS 505","BUS 511","BUS 516","BUS 518","BUS 520","BUS 525","BUS 530","BUS 535"];
+    let a=["BUS 601","BUS 620","BUS 635","BUS 650","BUS 685"];
+    let i=["BUS 690"];
+    let m=["MAJOR1","MAJOR2","MAJOR3","MAJOR4","MAJOR5","MAJOR6","MAJOR7","MAJOR8"];
+    let fD=f.every(c=>passed[c]||waived[c]);
+    let aD=a.every(c=>passed[c]||waived[c]);
+    let iD=i.every(c=>passed[c]||waived[c]);
+    let mD=m.every(c=>passed[c]||waived[c]);
+    let eD=passed["BUS 698"]||passed["BUS 699"]||passed["Open Elective"]||
+            passed["Open Elective 1"]||passed["Open Elective 2"]||
+            waived["BUS 698"]||waived["Open Elective"]||
+            waived["Open Elective 1"]||waived["Open Elective 2"]?true:false;
 
-/* AI PROGRESS — FIX: use Number() to ensure numeric addition */
-let percent=0,html="",ready=false;
+    percent=(Number(fD)+Number(aD)+Number(iD)+Number(mD)+Number(eD))*20;
+    html=`
+      <div class="${fD?'done':'notdone'}">Foundation (${f.filter(c=>passed[c]||waived[c]).length}/${f.length})</div>
+      <div class="${aD?'done':'notdone'}">Advanced (${a.filter(c=>passed[c]||waived[c]).length}/${a.length})</div>
+      <div class="${iD?'done':'notdone'}">Integrative (${i.filter(c=>passed[c]||waived[c]).length}/${i.length})</div>
+      <div class="${mD?'done':'notdone'}">Major (${m.filter(c=>passed[c]||waived[c]).length}/${m.length})</div>
+      <div class="${eD?'done':'notdone'}">Elective</div>
+    `;
+    ready=fD&&aD&&iD&&mD&&eD&&cgpa>=2.75;
+  }
 
-if(p==="MBA"){
-let f=["BUS 500","BUS 501","BUS 505","BUS 511","BUS 516","BUS 518","BUS 520","BUS 525","BUS 530","BUS 535"];
-let a=["BUS 601","BUS 620","BUS 635","BUS 650","BUS 685"];
-let i=["BUS 690"];
-let m=["MAJOR1","MAJOR2","MAJOR3","MAJOR4"];
+  if(p==="EMBA"){
+    let f=["EMB 500","EMB 501","EMB 502","EMB 510","EMB 520"];
+    let func=["EMB 601","EMB 602","EMB 620","EMB 650","EMB 660","EMB 670","EMB 690","BUS 700"];
+    let m=["MAJOR1","MAJOR2","MAJOR3","MAJOR4","MAJOR5","MAJOR6","MAJOR7","MAJOR8"];
+    let fD=f.every(c=>passed[c]||waived[c]);
+    let funcD=func.every(c=>passed[c]||waived[c]);
+    let mD=m.every(c=>passed[c]||waived[c]);
 
-let fD=f.every(c=>passed[c]||waived[c]);
-let aD=a.every(c=>passed[c]||waived[c]);
-let iD=i.every(c=>passed[c]||waived[c]);
-let mD=m.every(c=>passed[c]||waived[c]);
-let eD=passed["BUS 698"]||passed["BUS 699"]||passed["Open Elective"]||
-        passed["Open Elective 1"]||passed["Open Elective 2"]||
-        waived["BUS 698"]||waived["Open Elective"]||
-        waived["Open Elective 1"]||waived["Open Elective 2"]
-        ?true:false;
+    percent=(Number(fD)*33)+(Number(funcD)*33)+(Number(mD)*34);
+    html=`
+      <div class="${fD?'done':'notdone'}">Foundation (${f.filter(c=>passed[c]||waived[c]).length}/${f.length})</div>
+      <div class="${funcD?'done':'notdone'}">Functional (${func.filter(c=>passed[c]||waived[c]).length}/${func.length})</div>
+      <div class="${mD?'done':'notdone'}">Major (${m.filter(c=>passed[c]||waived[c]).length}/${m.length})</div>
+    `;
+    ready=fD&&funcD&&mD&&cgpa>=2.75;
+  }
 
-/* FIX: explicit numeric addition instead of boolean coercion */
-percent=(Number(fD)+Number(aD)+Number(iD)+Number(mD)+Number(eD))*20;
+  let pct=Math.min(Math.round(percent),100);
+  document.getElementById("courseBar").style.width=pct+"%";
+  document.getElementById("progressPercent").innerText=pct+"%";
+  document.getElementById("courseLevels").innerHTML=html;
+  document.getElementById("degreeMsg").innerText=ready?"🎓 NOW YOU CAN APPLY DEGREE ANALYSIS":"";
 
-html=`
-<div class="${fD?'done':'notdone'}">Foundation (${f.filter(c=>passed[c]||waived[c]).length}/${f.length})</div>
-<div class="${aD?'done':'notdone'}">Advanced (${a.filter(c=>passed[c]||waived[c]).length}/${a.length})</div>
-<div class="${iD?'done':'notdone'}">Integrative (${i.filter(c=>passed[c]||waived[c]).length}/${i.length})</div>
-<div class="${mD?'done':'notdone'}">Major (${m.filter(c=>passed[c]||waived[c]).length}/${m.length})</div>
-<div class="${eD?'done':'notdone'}">Elective</div>
-`;
+  cgpaHistory.push(parseFloat(cgpa));
+  drawGraph();
 
-ready=fD&&aD&&iD&&mD&&eD&&cgpa>=2.75;
-}
-
-if(p==="EMBA"){
-let f=["EMB 500","EMB 501","EMB 502","EMB 510","EMB 520"];
-let func=["EMB 601","EMB 602","EMB 620","EMB 650","EMB 660","EMB 670","EMB 690","BUS 700"];
-let m=["MAJOR1","MAJOR2","MAJOR3","MAJOR4"];
-
-let fD=f.every(c=>passed[c]||waived[c]);
-let funcD=func.every(c=>passed[c]||waived[c]);
-let mD=m.every(c=>passed[c]||waived[c]);
-
-/* FIX: explicit numeric values for percent calculation */
-percent=(Number(fD)*33)+(Number(funcD)*33)+(Number(mD)*34);
-
-html=`
-<div class="${fD?'done':'notdone'}">Foundation (${f.filter(c=>passed[c]||waived[c]).length}/${f.length})</div>
-<div class="${funcD?'done':'notdone'}">Functional (${func.filter(c=>passed[c]||waived[c]).length}/${func.length})</div>
-<div class="${mD?'done':'notdone'}">Major (${m.filter(c=>passed[c]||waived[c]).length}/${m.length})</div>
-`;
-
-ready=fD&&funcD&&mD&&cgpa>=2.75;
-}
-
-/* FIX: apply width as a valid percentage string */
-let pct=Math.min(Math.round(percent),100);
-document.getElementById("courseBar").style.width=pct+"%";
-document.getElementById("progressPercent").innerText=pct+"%";
-document.getElementById("courseLevels").innerHTML=html;
-document.getElementById("degreeMsg").innerText=
-ready?"🎓 NOW YOU CAN APPLY DEGREE ANALYSIS":"";
-
-/* GRAPH */
-cgpaHistory.push(parseFloat(cgpa));
-drawGraph();
-
-/* STATUS */
-document.getElementById("status").innerText=
-(cgpa>=2.75)?"✅ On Track":"❌ Risk Zone";
-
+  document.getElementById("status").innerText=(cgpa>=2.75)?"✅ On Track":"❌ Risk Zone";
 }
 
 function drawGraph(){
-let c=document.getElementById("cgpaChart");
-let ctx=c.getContext("2d");
-ctx.clearRect(0,0,c.width,c.height);
+  let c=document.getElementById("cgpaChart");
+  let ctx=c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
 
-if(cgpaHistory.length<2){
-ctx.fillStyle="#aaa";
-ctx.font="12px sans-serif";
-ctx.textAlign="center";
-ctx.fillText("Add more entries to see CGPA trend",c.width/2,c.height/2);
-return;
-}
+  if(cgpaHistory.length<2){
+    ctx.fillStyle="#aaa";ctx.font="12px sans-serif";ctx.textAlign="center";
+    ctx.fillText("Add more entries to see CGPA trend",c.width/2,c.height/2);
+    return;
+  }
 
-let len=cgpaHistory.length;
-let padL=30,padR=10,padT=10,padB=20;
-let w=c.width-padL-padR;
-let h=c.height-padT-padB;
+  let len=cgpaHistory.length;
+  let padL=30,padR=10,padT=10,padB=20;
+  let w=c.width-padL-padR,h=c.height-padT-padB;
 
-/* grid lines */
-ctx.strokeStyle="#ddd";
-ctx.lineWidth=0.5;
-[1,2,3,4].forEach(v=>{
-let y=padT+h-(v/4)*h;
-ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+w,y);ctx.stroke();
-ctx.fillStyle="#888";ctx.font="9px sans-serif";ctx.textAlign="right";
-ctx.fillText(v.toFixed(0),padL-3,y+3);
-});
+  ctx.strokeStyle="#ddd";ctx.lineWidth=0.5;
+  [1,2,3,4].forEach(v=>{
+    let y=padT+h-(v/4)*h;
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+w,y);ctx.stroke();
+    ctx.fillStyle="#888";ctx.font="9px sans-serif";ctx.textAlign="right";
+    ctx.fillText(v.toFixed(0),padL-3,y+3);
+  });
 
-/* line */
-ctx.beginPath();
-ctx.strokeStyle="#00e676";
-ctx.lineWidth=2;
-cgpaHistory.forEach((v,i)=>{
-let x=padL+i*(w/(len-1));
-let y=padT+h-((v/4)*h);
-if(i===0) ctx.moveTo(x,y);
-else ctx.lineTo(x,y);
-});
-ctx.stroke();
+  ctx.beginPath();ctx.strokeStyle="#00e676";ctx.lineWidth=2;
+  cgpaHistory.forEach((v,i)=>{
+    let x=padL+i*(w/(len-1));
+    let y=padT+h-((v/4)*h);
+    if(i===0) ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
 
-/* dots */
-ctx.fillStyle="#00e676";
-cgpaHistory.forEach((v,i)=>{
-let x=padL+i*(w/(len-1));
-let y=padT+h-((v/4)*h);
-ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();
-});
+  ctx.fillStyle="#00e676";
+  cgpaHistory.forEach((v,i)=>{
+    let x=padL+i*(w/(len-1));
+    let y=padT+h-((v/4)*h);
+    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();
+  });
 }
 
 function clearAll(){
-document.getElementById("rows").innerHTML="";
-cgpaHistory=[];
-document.getElementById("courseBar").style.width="0%";
-document.getElementById("progressPercent").innerText="";
-document.getElementById("courseLevels").innerHTML="";
-document.getElementById("degreeMsg").innerText="";
-document.getElementById("advisor").innerText="";
-document.getElementById("simulator").innerText="";
-document.getElementById("retake").innerText="";
-document.getElementById("status").innerText="";
-document.getElementById("cgpa").innerText="0.00";
-document.getElementById("credits").innerText="0";
-document.getElementById("counted").innerText="0";
-document.getElementById("passed").innerText="0";
-let c=document.getElementById("cgpaChart");
-let ctx=c.getContext("2d");
-ctx.clearRect(0,0,c.width,c.height);
+  document.getElementById("rows").innerHTML="";
+  cgpaHistory=[];
+  document.getElementById("openElectiveWarn").style.display="none";
+  document.getElementById("courseBar").style.width="0%";
+  document.getElementById("progressPercent").innerText="";
+  document.getElementById("courseLevels").innerHTML="";
+  document.getElementById("degreeMsg").innerText="";
+  document.getElementById("advisor").innerText="";
+  document.getElementById("simulator").innerText="";
+  document.getElementById("retake").innerText="";
+  document.getElementById("status").innerText="";
+  document.getElementById("cgpa").innerText="0.00";
+  document.getElementById("counted").innerText="0";
+  document.getElementById("passed").innerText="0";
+  document.getElementById("remaining").innerText="—";
+  let c=document.getElementById("cgpaChart");
+  c.getContext("2d").clearRect(0,0,c.width,c.height);
 }
-
 </script>
-
 </body>
 </html>
