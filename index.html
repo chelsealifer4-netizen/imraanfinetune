@@ -135,7 +135,7 @@ canvas{background:white;border-radius:8px;margin-top:8px;}
       <a href="flowchart.html">Course Flowchart</a>
       <a href="gpolicy.html">Grading Policy</a>
       <a href="help.html">User Guideline</a>
-      <a href="https://www.northsouth.edu/academics/schools/sbe/mba-emba-programs.html" target="_blank">Official E/MBA Website</a>
+      <a href="https://www.northsouth.edu/academic/sbe/mba-emba/" target="_blank">Official E/MBA Website</a>
     </div>
   </div>
 
@@ -171,11 +171,11 @@ canvas{background:white;border-radius:8px;margin-top:8px;}
 
         <div class="result">
           <div>CGPA: <span id="cgpa">0.00</span></div>
-          <div>Credit Counted: <span id="counted">0</span></div>
+          <div>Credits Counted: <span id="counted">0</span></div>
         </div>
         <div class="result">
-          <div>Credit Passed: <span id="passed">0</span></div>
-          <div>Credit Remaining: <span id="remaining">—</span></div>
+          <div>Credits Passed: <span id="passed">0</span></div>
+          <div>Credits Remaining: <span id="remaining">—</span></div>
         </div>
 
         <div class="disclaimer">
@@ -318,12 +318,14 @@ function checkOpenElectiveWarning(){
 
   if(p==="MBA" && b==="new"){
     let rows=document.querySelectorAll(".row");
-    let hasOpenElective=false;
+    let showWarn=false;
     rows.forEach(r=>{
       let c=r.querySelector(".course").value;
-      if(c==="Open Elective") hasOpenElective=true;
+      let g=r.querySelector(".grade").value;
+      // Only show warning if "Open Elective" is selected AND grade is "Waived"
+      if(c==="Open Elective" && g==="Waived") showWarn=true;
     });
-    warnEl.style.display=hasOpenElective?"block":"none";
+    warnEl.style.display=showWarn?"block":"none";
   } else {
     warnEl.style.display="none";
   }
