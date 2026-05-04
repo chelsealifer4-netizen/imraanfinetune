@@ -114,6 +114,41 @@ canvas{background:white;border-radius:8px;margin-top:8px;}
   padding:7px 10px;border-radius:8px;
   border-left:3px solid #66b2ff;
 }
+
+/* ── POPUP STYLES (new) ── */
+#gradePopup{
+  display:none;
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:999;
+  background:#0d2a52;
+  border:1.5px solid #66b2ff;
+  border-radius:12px;
+  padding:20px 24px;
+  min-width:260px;
+  max-width:340px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  text-align:center;
+  font-family:'Josefin Sans';
+  color:white;
+}
+#gradePopup .popup-icon{font-size:28px;margin-bottom:6px;}
+#gradePopup .popup-msg{font-size:14px;line-height:1.5;margin-bottom:14px;}
+#gradePopup .popup-close{
+  padding:6px 20px;font-size:13px;
+  font-family:'Josefin Sans';font-weight:600;
+  border:none;border-radius:8px;
+  background:#66b2ff;color:white;
+  cursor:pointer;transition:background 0.2s;
+}
+#gradePopup .popup-close:hover{background:#3a9aee;}
+#popupOverlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:998;
+}
 </style>
 </head>
 
@@ -191,7 +226,7 @@ canvas{background:white;border-radius:8px;margin-top:8px;}
 
         <div class="box">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <b>🧠 AI Level Progress</b>
+            <b>📚 Course Level Progress</b>
             <span id="progressPercent" style="font-size:12px;font-weight:600;color:#00e676;">0%</span>
           </div>
           <div class="progress-bar"><div id="courseBar" class="progress-fill"></div></div>
@@ -207,6 +242,14 @@ canvas{background:white;border-radius:8px;margin-top:8px;}
   </div>
 </div>
 
+<!-- POPUP (new) -->
+<div id="popupOverlay" onclick="closePopup()"></div>
+<div id="gradePopup">
+  <div id="popupIcon" class="popup-icon"></div>
+  <div id="popupMsg" class="popup-msg"></div>
+  <button class="popup-close" onclick="closePopup()">OK</button>
+</div>
+
 <script>
 let gradeMap={
   "A":4,"A-":3.7,"B+":3.3,"B":3,"B-":2.7,
@@ -214,6 +257,55 @@ let gradeMap={
 };
 
 let cgpaHistory=[];
+
+/* ── POPUP HELPERS (new) ── */
+function showPopup(icon, msg){
+  document.getElementById("popupIcon").innerText=icon;
+  document.getElementById("popupMsg").innerText=msg;
+  document.getElementById("gradePopup").style.display="block";
+  document.getElementById("popupOverlay").style.display="block";
+}
+function closePopup(){
+  document.getElementById("gradePopup").style.display="none";
+  document.getElementById("popupOverlay").style.display="none";
+}
+
+/* ── NEXT-COURSE MAP (new) ── */
+const nextCourseMap={
+  // MBA
+  "BUS 500":"BUS 501","BUS 501":"BUS 505","BUS 505":"BUS 511",
+  "BUS 511":"BUS 516","BUS 516":"BUS 518","BUS 518":"BUS 520",
+  "BUS 520":"BUS 525","BUS 525":"BUS 530","BUS 530":"BUS 535",
+  "BUS 535":"BUS 601","BUS 601":"BUS 620","BUS 620":"BUS 635",
+  "BUS 635":"BUS 650","BUS 650":"BUS 685","BUS 685":"BUS 690",
+  "BUS 690":"BUS 698","BUS 698":"BUS 699","BUS 699":"Open Elective",
+  // EMBA
+  "EMB 500":"EMB 501","EMB 501":"EMB 502","EMB 502":"EMB 510",
+  "EMB 510":"EMB 520","EMB 520":"EMB 601","EMB 601":"EMB 602",
+  "EMB 602":"EMB 620","EMB 620":"EMB 650","EMB 650":"EMB 660",
+  "EMB 660":"EMB 670","EMB 670":"EMB 690","EMB 690":"BUS 700"
+};
+
+/* ── GRADE-POPUP TRIGGER (new) ── */
+function handleGradePopup(course, grade){
+  if(!course || !grade) return;
+
+  const goodGrades=["A","A-","B+","B","B-"];
+  const cautionGrades=["C+","C","C-"];
+  const badGrades=["D+","D","F"];
+
+  if(goodGrades.includes(grade)){
+    let next=nextCourseMap[course];
+    let msg=next
+      ? `Great job on ${course}!\nYour next course is: ${next}`
+      : `Great job on ${course}!\nYou have completed this course sequence.`;
+    showPopup("✅", msg);
+  } else if(cautionGrades.includes(grade)){
+    showPopup("⚠️", `You scored ${grade} in ${course}.\nYou should consider a retake.`);
+  } else if(badGrades.includes(grade)){
+    showPopup("🚨", `You scored ${grade} in ${course}.\nYou must retake this course.`);
+  }
+}
 
 function handleProgram(){
   let p=document.getElementById("program").value;
@@ -289,7 +381,18 @@ function addRow(){
     <button onclick="this.parentElement.remove();calculate()">X</button>
   `;
   document.getElementById("rows").appendChild(div);
-  div.querySelectorAll("select").forEach(s=>s.onchange=calculate);
+
+  /* attach change listeners — popup fires only when BOTH are selected (new) */
+  let courseEl=div.querySelector(".course");
+  let gradeEl=div.querySelector(".grade");
+
+  function onRowChange(){
+    calculate();
+    handleGradePopup(courseEl.value, gradeEl.value);
+  }
+
+  courseEl.onchange=onRowChange;
+  gradeEl.onchange=onRowChange;
 }
 
 function getCredit(course, grade, program, batch){
